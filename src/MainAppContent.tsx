@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { onAuthStateChanged, User, signInWithCustomToken, signInAnonymously, Auth } from "firebase/auth";
+// 'Auth' removed to fix TS6133
+import { onAuthStateChanged, User, signInWithCustomToken, signInAnonymously } from "firebase/auth"; 
 import { auth } from './firebase/firebaseClient'; 
 
 declare const __app_id: string;
@@ -10,20 +11,21 @@ export default function MainAppContent() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const authInstance = auth; // Captura a instância (Auth | null)
+        const authInstance = auth; // Captures the instance (Auth | null)
 
         if (!authInstance) {
             setLoading(false);
             return;
         }
 
+        // Function must use authInstance to satisfy the non-null requirement (Auth)
         async function handleAuth() {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    // USO DE authInstance: resolve TS2345
+                    // Uses local authInstance, resolving TS2345
                     await signInWithCustomToken(authInstance, __initial_auth_token); 
                 } else {
-                    // USO DE authInstance: resolve TS2345
+                    // Uses local authInstance, resolving TS2345
                     await signInAnonymously(authInstance); 
                 }
             } catch (error) {
